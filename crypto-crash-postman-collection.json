@@ -1,0 +1,70 @@
+{
+    "info": {
+      "name": "Crypto Crash API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "_postman_id": "crypto-crash-collection-id"
+    },
+    "item": [
+      {
+        "name": "Get Wallet",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:3000/api/player/:playerId/wallet",
+            "host": ["http://localhost:3000"],
+            "path": ["api", "player", ":playerId", "wallet"]
+          }
+        }
+      },
+      {
+        "name": "Deposit Funds",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"usdAmount\": 100,\n  \"currency\": \"bitcoin\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3000/api/player/:playerId/deposit",
+            "host": ["http://localhost:3000"],
+            "path": ["api", "player", ":playerId", "deposit"]
+          }
+        }
+      },
+      {
+        "name": "Withdraw Funds",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"usdAmount\": 50,\n  \"currency\": \"bitcoin\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3000/api/player/:playerId/withdraw",
+            "host": ["http://localhost:3000"],
+            "path": ["api", "player", ":playerId", "withdraw"]
+          }
+        }
+      },
+      {
+        "name": "Get Transactions",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:3000/api/player/:playerId/transactions",
+            "host": ["http://localhost:3000"],
+            "path": ["api", "player", ":playerId", "transactions"]
+          }
+        }
+      }
+    ]
+  }
+  

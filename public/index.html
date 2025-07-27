@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto Crash Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #0e0e0e;
+      color: #f0f0f0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .container {
+      background: #1e1e1e;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+    }
+    input, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    input {
+      background: #2b2b2b;
+      color: #f0f0f0;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .status {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+    }
+    .multiplier {
+      font-size: 2rem;
+      font-weight: 600;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>💥 Crypto Crash</h1>
+  <div class="container">
+    <label for="playerId">🔐 Enter Player ID:</label>
+    <input type="text" id="playerId" placeholder="Paste a valid Player ID" />
+
+    <button onclick="placeBet()">🎲 Place Bet ($10 BTC)</button>
+    <button onclick="cashout()">💸 Cashout</button>
+
+    <div class="multiplier" id="multiplier">Multiplier: 1.00x</div>
+    <div class="status" id="status">Waiting for round...</div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let currentPlayerId = '';
+
+    function placeBet() {
+      currentPlayerId = document.getElementById('playerId').value.trim();
+      if (!currentPlayerId) return alert('Enter a valid Player ID');
+
+      fetch('/api/bet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerId: currentPlayerId,
+          amountUsd: 10,
+          cryptoType: 'BTC'
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert(`Bet placed! Crypto Amount: ${data.cryptoAmount}`);
+          } else {
+            alert('❌ Error placing bet');
+          }
+        })
+        .catch(err => alert('❌ ' + err.message));
+    }
+
+    function cashout() {
+      if (!currentPlayerId) return alert('Enter Player ID first');
+
+      fetch('/api/cashout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: currentPlayerId })
+      })
+        .then(res => res.json())
+        .then(data => alert(data.message || 'Cashout sent'))
+        .catch(err => alert('❌ ' + err.message));
+    }
+
+    socket.on('roundStart', (data) => {
+      document.getElementById('status').innerText = `🟢 New Round: ${data.roundId}`;
+    });
+
+    socket.on('multiplierUpdate', (data) => {
+      document.getElementById('multiplier').innerText = `Multiplier: ${data.multiplier}x`;
+    });
+
+    socket.on('crash', (data) => {
+      document.getElementById('status').innerText = `💥 Crashed at ${data.crashPoint}x`;
+    });
+
+    socket.on('cashout', (data) => {
+      if (data.playerId === currentPlayerId) {
+        alert(`✅ Cashout at ${data.multiplier}x | Amount: ${data.cryptoAmount}`);
+      }
+    });
+  </script>
+</body>
+</html>
