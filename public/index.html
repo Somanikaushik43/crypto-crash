@@ -76,16 +76,17 @@
     <div class="status" id="status">Waiting for round...</div>
   </div>
 
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://241c8951486e.ngrok-free.app/socket.io/socket.io.js"></script>
   <script>
-    const socket = io();
+    const API_BASE='https://241c8951486e.ngrok-free.app/api';
+    const socket=io('https://241c8951486e.ngrok-free.app/api');
     let currentPlayerId = '';
 
     function placeBet() {
       currentPlayerId = document.getElementById('playerId').value.trim();
       if (!currentPlayerId) return alert('Enter a valid Player ID');
 
-      fetch('/api/bet', {
+      fetch(`${API_BASE}/bet`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -108,7 +109,7 @@
     function cashout() {
       if (!currentPlayerId) return alert('Enter Player ID first');
 
-      fetch('/api/cashout', {
+      fetch(`${API_BASE}/cashout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playerId: currentPlayerId })
