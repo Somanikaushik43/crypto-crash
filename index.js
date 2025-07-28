@@ -16,10 +16,25 @@ const io = socketIo(server);
 
 app.use(express.static('public'))
 
-app.use(express.json());
+app.use((req, res, next) => {
+  if (req.method === 'GET' || req.method === 'HEAD') {
+    return next();
+  }
+  express.json()(req, res, next);
+});
+
+// app.use(express.json());
 app.use('/api', gameRoutes);
 app.use('/api', walletRoutes);
 app.use('/api',playerRoutes);
+
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('Bad JSON:', err.message);
+    return res.status(400).json({ error: 'Invalid JSON payload' });
+  }
+  next(err);
+});
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,

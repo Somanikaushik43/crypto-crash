@@ -1,5 +1,16 @@
 const Player = require('../models/Player');
 
+exports.createPlayer=async(req,res)=>{
+    try{
+        const {name,cryptoBalances}=req.body;
+        const player=new Player({name,cryptoBalances});
+        await player.save();
+        res.status(201).json(player);
+    }catch(err){
+        res.status(500).json({error:'Failed to create player'});
+    }
+};
+
 exports.getAllPlayers = async (req, res) => {
   try {
     const players = await Player.find();
